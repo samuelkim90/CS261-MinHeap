@@ -1,0 +1,368 @@
+# Name: Samuel Kim
+# OSU Email: kims6@oregonstate.edu
+# Course: CS261 - Data Structures
+# Assignment: Min Heap
+# Due Date: 28 FEB 2022
+# Description: Min Heap Dynamic Array Implementation
+
+# Import DynamicArray from Assignment 2
+from dynamic_array import *
+
+
+class MinHeapException(Exception):
+    """
+    Custom exception to be used by MinHeap class
+    DO NOT CHANGE THIS CLASS IN ANY WAY
+    """
+    pass
+
+
+class MinHeap:
+    def __init__(self, start_heap=None):
+        """
+        Initializes a new MinHeap
+        DO NOT CHANGE THIS METHOD IN ANY WAY
+        """
+        self.heap = DynamicArray()
+
+        # populate MH with initial values (if provided)
+        # before using this feature, implement add() method
+        if start_heap:
+            for node in start_heap:
+                self.add(node)
+
+    def __str__(self) -> str:
+        """
+        Return MH content in human-readable form
+        DO NOT CHANGE THIS METHOD IN ANY WAY
+        """
+        heap_data = [self.heap[i] for i in range(self.heap.length())]
+        return 'HEAP ' + str(heap_data)
+
+    def is_empty(self) -> bool:
+        """
+        Returns True if heap is empty and otherwise False if not empty
+        """
+        if self.heap.is_empty():
+            return True
+        else:
+            return False
+
+    def add(self, node: object) -> None:
+        """
+        Adds new node to MinHeap while maintaining heap property
+        """
+        if self.is_empty():
+            self.heap.append(node)
+        else:
+            self.heap.append(node)
+            added_index = self.heap.length() - 1
+            parent_index = (added_index - 1) // 2
+            while self.heap.get_at_index(added_index) < self.heap.get_at_index(parent_index):
+                ref_value = self.heap.get_at_index(parent_index)
+                self.heap.set_at_index(parent_index, self.heap.get_at_index(added_index))
+                self.heap.set_at_index(added_index, ref_value)
+                added_index = parent_index
+                parent_index = (added_index - 1) // 2
+                if parent_index < 0:
+                    break
+
+    def get_min(self) -> object:
+        """
+        Returns minimum node in the heap and a MinHeapException if empty
+        """
+        if self.is_empty():
+            raise MinHeapException
+        else:
+            return self.heap.get_at_index(0)
+
+    def remove_min(self) -> object:
+        """
+        Returns minimum node and removes it. Raises MinHeapException if empty
+        """
+        h = self.heap
+        if self.is_empty():
+            raise MinHeapException
+        min_value = self.heap.get_at_index(0)
+        h.set_at_index(0, h.get_at_index(h.length() - 1))
+        h.remove_at_index(h.length() - 1)
+        new_index = 0
+        child_index = new_index * 2
+        if new_index == h.length() - 1:
+            return min_value
+        while child_index < h.length():
+            if self.is_empty():
+                raise MinHeapException
+            if child_index + 1 >= h.length() or child_index + 2 >= h.length():
+                if child_index + 1 >= h.length() and child_index + 2 >= h.length():
+                    return min_value
+                elif child_index + 2 >= h.length():
+                    if h.get_at_index(new_index) > h.get_at_index(child_index + 1):
+                        self.remove_helper(new_index, child_index + 1, min_value)
+                        new_index = child_index + 1
+                        child_index = new_index * 2
+                    return min_value
+                else:
+                    if h.get_at_index(new_index) > h.get_at_index(child_index + 2):
+                        self.remove_helper(new_index, child_index + 2, min_value)
+                        new_index = child_index + 2
+                        child_index = new_index * 2
+                return min_value
+            if h.get_at_index(child_index + 2) < h.get_at_index(child_index + 1):
+                if h.get_at_index(new_index) > h.get_at_index(child_index + 2):
+                    self.remove_helper(new_index, child_index + 2, min_value)
+                    new_index = child_index + 2
+                    child_index = new_index * 2
+                else:
+                    return min_value
+            else:
+                if h.get_at_index(new_index) > h.get_at_index(child_index + 1):
+                    self.remove_helper(new_index, child_index + 1, min_value)
+                    new_index = child_index + 1
+                    child_index = new_index * 2
+                else:
+                    return min_value
+        return min_value
+
+    def remove_helper(self, new_index, child_adjusted, min_value):
+        h = self.heap
+        ref_node = h.get_at_index(new_index)
+        h.set_at_index(new_index, h.get_at_index(child_adjusted))
+        h.set_at_index(child_adjusted, ref_node)
+        new_index = child_adjusted
+        return min_value
+
+    def build_heap(self, da: DynamicArray) -> None:
+        """
+        Receives a dynamic array and adds elements into proper min heap
+        """
+        da_copy = DynamicArray()
+        for num in range(0, da.length()):
+            da_copy.append(da.get_at_index(num))
+
+        index = (da_copy.length()//2) - 1
+        child_index = index * 2
+        self.heap = da_copy
+        h = self.heap
+
+        if da_copy.is_empty():
+            return None
+
+        if da_copy.length() <= 2:
+            if da_copy.length() == 1:
+                return
+            else:
+                if h.get_at_index(1) < h.get_at_index(0):
+                    ref_value = h.get_at_index(0)
+                    h.set_at_index(0, h.get_at_index(1))
+                    h.set_at_index(1, ref_value)
+            return
+
+        while index > -1:
+            if h.get_at_index(child_index + 1) > h.get_at_index(index) and h.get_at_index(child_index + 2) > h.get_at_index(index):
+                index -= 1
+                child_index = index * 2
+                continue
+            elif h.get_at_index(child_index + 2) < h.get_at_index(index):
+                ref_value = h.get_at_index(index)
+                h.set_at_index(index, h.get_at_index(child_index + 2))
+                h.set_at_index(child_index + 2, ref_value)
+                index -= 1
+                child_index = index * 2
+                continue
+            else:
+                ref_value = h.get_at_index(index)
+                h.set_at_index(index, h.get_at_index(child_index + 1))
+                h.set_at_index(child_index + 1, ref_value)
+                index -= 1
+                child_index = index * 2
+                continue
+
+        if h.get_at_index(3) < h.get_at_index(1) or h.get_at_index(4) < h.get_at_index(1):
+            if h.get_at_index(4) < h.get_at_index(1):
+                ref_value = h.get_at_index(1)
+                h.set_at_index(1, h.get_at_index(4))
+                h.set_at_index(4, ref_value)
+            else:
+                ref_value = h.get_at_index(1)
+                h.set_at_index(1, h.get_at_index(3))
+                h.set_at_index(3, ref_value)
+
+        if h.get_at_index(5) < h.get_at_index(2) or h.get_at_index(6) < h.get_at_index(2):
+            if h.get_at_index(6) < h.get_at_index(2):
+                ref_value = h.get_at_index(2)
+                h.set_at_index(2, h.get_at_index(6))
+                h.set_at_index(6, ref_value)
+            else:
+                ref_value = h.get_at_index(2)
+                h.set_at_index(2, h.get_at_index(5))
+                h.set_at_index(5, ref_value)
+
+
+    def size(self) -> int:
+        """
+        Returns the number of items currently stored in the heap
+        """
+        h = self.heap
+
+        return h.length()
+
+    def clear(self) -> None:
+        """
+        Clears the contents of the heap
+        """
+        self.heap = DynamicArray()
+
+
+def heapsort(da: DynamicArray) -> None:
+    """
+    Sorts given DynamicArray into non-ascending order
+    """
+    n = da.length()
+    k = n - 1
+    h = MinHeap()
+    h.build_heap(da)
+
+    while k > 1:
+        print("k:", k)
+        last_index = heapsort_helper(k)
+        da.set_at_index(k, last_index)
+        print(da)
+        k -= 1
+
+
+def heapsort_helper(k):
+    """
+    Helper method for heapsort in heap
+    """
+    current = 0
+    left = (current * 2) + 1
+    right = (current * 2) + 2
+    ref = h.heap.get_at_index(0)
+    h.heap.set_at_index(0, h.heap.get_at_index(k))
+    h.heap.set_at_index(k, ref)
+    print("current:", current, "k:", k, h.heap)
+    while current < k:
+        if right > k and left > k:
+            break
+        elif left < k < right:
+            if h.heap.get_at_index(left) > h.heap.get_at_index(current):
+                ref = h.heap.get_at_index(current)
+                h.heap.set_at_index(current, h.heap.get_at_index(left))
+                h.heap.set_at_index(left, ref)
+                current = left
+                left = (current * 2) + 1
+                right = (current * 2) + 2
+        elif right < k < left:
+            if h.heap.get_at_index(right) > h.heap.get_at_index(current):
+                ref = h.heap.get_at_index(current)
+                h.heap.set_at_index(current, h.heap.get_at_index(right))
+                h.heap.set_at_index(left, ref)
+                current = right
+                left = (current * 2) + 1
+                right = (current * 2) + 2
+        elif h.heap.get_at_index(right) < h.heap.get_at_index(left):
+            if h.heap.get_at_index(current) > h.heap.get_at_index(right):
+                ref = h.heap.get_at_index(current)
+                h.heap.set_at_index(current, h.heap.get_at_index(right))
+                h.heap.set_at_index(right, ref)
+                current = right
+                left = (current * 2) + 1
+                right = (current * 2) + 2
+        else:
+            if h.heap.get_at_index(left) < h.heap.get_at_index(right):
+                if h.heap.get_at_index(current) > h.heap.get_at_index(left):
+                    ref = h.heap.get_at_index(current)
+                    h.heap.set_at_index(current, h.heap.get_at_index(left))
+                    h.heap.set_at_index(left, ref)
+                    current = left
+                    left = (current * 2) + 1
+                    right = (current * 2) + 2
+    print(h.heap)
+    return h.heap.get_at_index(k)
+
+
+# BASIC TESTING
+if __name__ == '__main__':
+    print("\nPDF - is_empty example 1")
+    print("-------------------")
+    h = MinHeap()
+    h.heap = DynamicArray([2, 4, 12, 56, 8, 34, 67])
+    print(h.is_empty())
+
+    print("\nPDF - is_empty example 2")
+    print("-------------------")
+    h = MinHeap()
+    print(h.is_empty())
+
+    print("\nPDF - add example 1")
+    print("-------------------")
+    h = MinHeap()
+    print(h, h.is_empty())
+    for value in range(300, 200, -15):
+        h.add(value)
+        print(h)
+
+    print("\nPDF - add example 2")
+    print("-------------------")
+    h = MinHeap(['fish', 'bird'])
+    print(h)
+    for value in ['monkey', 'zebra', 'elephant', 'horse', 'bear']:
+        h.add(value)
+        print(h)
+
+    print("\nPDF - get_min example 1")
+    print("-----------------------")
+    h = MinHeap(['fish', 'bird'])
+    print(h)
+    print(h.get_min(), h.get_min())
+
+    print("\nPDF - remove_min example 1")
+    print("--------------------------")
+    h = MinHeap([1, 10, 2, 9, 3, 8, 4, 7, 5, 6])
+    while not h.is_empty() and h.is_empty() is not None:
+        print(h, end=' ')
+        print(h.remove_min())
+
+    print("\nPDF - build_heap example 1")
+    print("--------------------------")
+    da = DynamicArray([100, 20, 6, 200, 90, 150, 300])
+    h = MinHeap(['zebra', 'apple'])
+    print(h)
+    h.build_heap(da)
+    print(h)
+    da[0] = 500
+    print(da)
+    print(h)
+
+    print("\nPDF - heapsort example 1")
+    print("------------------------")
+    da = DynamicArray([100, 20, 6, 200, 90, 150, 300])
+    print(f"Before: {da}")
+    heapsort(da)
+    print(f"After:  {da}")
+
+    print("\nPDF - heapsort example 2")
+    print("------------------------")
+    da = DynamicArray(['monkey', 'zebra', 'elephant', 'horse', 'bear'])
+    print(f"Before: {da}")
+    heapsort(da)
+    print(f"After:  {da}")
+
+    print("\nPDF - size example 1")
+    print("--------------------")
+    h = MinHeap([100, 20, 6, 200, 90, 150, 300])
+    print(h.size())
+
+    print("\nPDF - size example 2")
+    print("--------------------")
+    h = MinHeap([])
+    print(h.size())
+
+    print("\nPDF - clear example 1")
+    print("---------------------")
+    h = MinHeap(['monkey', 'zebra', 'elephant', 'horse', 'bear'])
+    print(h)
+    print(h.clear())
+    print(h)
+
