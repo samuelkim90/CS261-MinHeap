@@ -224,11 +224,12 @@ def heapsort(da: DynamicArray) -> None:
     h.build_heap(da)
 
     while k > 1:
-        print("k:", k)
+        print("haha k:", k)
         last_index = heapsort_helper(k)
-        da.set_at_index(k, last_index)
+        da.set_at_index(n - 1, last_index)
         print(da)
         k -= 1
+        n -= 1
 
 
 def heapsort_helper(k):
@@ -243,6 +244,7 @@ def heapsort_helper(k):
     h.heap.set_at_index(k, ref)
     print("current:", current, "k:", k, h.heap)
     while current < k:
+        print("this1")
         if right > k and left > k:
             break
         elif left < k < right:
@@ -253,6 +255,7 @@ def heapsort_helper(k):
                 current = left
                 left = (current * 2) + 1
                 right = (current * 2) + 2
+                print(h.heap, "1")
         elif right < k < left:
             if h.heap.get_at_index(right) > h.heap.get_at_index(current):
                 ref = h.heap.get_at_index(current)
@@ -261,6 +264,7 @@ def heapsort_helper(k):
                 current = right
                 left = (current * 2) + 1
                 right = (current * 2) + 2
+                print(h.heap, "2")
         elif h.heap.get_at_index(right) < h.heap.get_at_index(left):
             if h.heap.get_at_index(current) > h.heap.get_at_index(right):
                 ref = h.heap.get_at_index(current)
@@ -269,16 +273,21 @@ def heapsort_helper(k):
                 current = right
                 left = (current * 2) + 1
                 right = (current * 2) + 2
-        else:
-            if h.heap.get_at_index(left) < h.heap.get_at_index(right):
-                if h.heap.get_at_index(current) > h.heap.get_at_index(left):
-                    ref = h.heap.get_at_index(current)
-                    h.heap.set_at_index(current, h.heap.get_at_index(left))
-                    h.heap.set_at_index(left, ref)
-                    current = left
-                    left = (current * 2) + 1
-                    right = (current * 2) + 2
-    print(h.heap)
+                print(h.heap, "3")
+        elif h.heap.get_at_index(left) < h.heap.get_at_index(right):
+            if h.heap.get_at_index(current) > h.heap.get_at_index(left):
+                ref = h.heap.get_at_index(current)
+                h.heap.set_at_index(current, h.heap.get_at_index(left))
+                h.heap.set_at_index(left, ref)
+                current = left
+                left = (current * 2) + 1
+                right = (current * 2) + 2
+                print(h.heap, "4")
+        elif h.heap.get_at_index(current) > h.heap.get_at_index(left) and h.heap.get_at_index(current) > h.heap.get_at_index(right):
+            print("this2")
+            break
+    print(h.heap, "final")
+    print("k:", k, "value:", h.heap.get_at_index(k))
     return h.heap.get_at_index(k)
 
 
