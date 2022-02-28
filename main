@@ -136,36 +136,37 @@ class MinHeap:
         """
         Receives a dynamic array and adds elements into proper min heap
         """
-        da_copy = DynamicArray()
-        for num in range(0, da.length()):
-            da_copy.append(da.get_at_index(num))
-
-        index = (da_copy.length()//2) - 1
-        left = (index * 2) + 1
-        right = (index * 2) + 2
-        self.heap = da_copy
+        self.heap = da
         h = self.heap
 
-        if da_copy.is_empty():
+        index = (h.length()//2) - 1
+        left = (index * 2) + 1
+        right = (index * 2) + 2
+        # 0:no change, 1:left, 2: right
+        last = 0
+
+        if h.is_empty():
             return None
 
-        if da_copy.length() <= 2:
-            if da_copy.length() == 1:
-                return
+        if h.length() <= 2:
+            if h.length() == 1:
+                return None
             else:
                 if h.get_at_index(1) < h.get_at_index(0):
                     ref_value = h.get_at_index(0)
                     h.set_at_index(0, h.get_at_index(1))
                     h.set_at_index(1, ref_value)
-            return
+            return None
 
         while index > -1:
+            left = (index * 2) + 1
+            right = (index * 2) + 2
             print(h)
             print("index/left/right", index, left, h.get_at_index(left), right, h.get_at_index(right))
+            # If both children are higher value, continue
             if h.get_at_index(left) > h.get_at_index(index) and h.get_at_index(right) > h.get_at_index(index):
                 index -= 1
-                left = (index * 2) + 1
-                right = (index * 2) + 2
+                last = 0
                 continue
             if right > h.length() - 1:
                 if h.get_at_index(left) < h.get_at_index(index):
@@ -173,25 +174,55 @@ class MinHeap:
                     h.set_at_index(index, h.get_at_index(left))
                     h.set_at_index(left, ref_value)
                     index -= 1
-                    left = (index * 2) + 1
-                    right = (index * 2) + 2
+                    last = 1
+                    continue
             elif h.get_at_index(right) < h.get_at_index(index) or h.get_at_index(left) < h.get_at_index(index):
                 if h.get_at_index(right) < h.get_at_index(left):
                     ref_value = h.get_at_index(index)
                     h.set_at_index(index, h.get_at_index(right))
                     h.set_at_index(right, ref_value)
                     index -= 1
-                    left = (index * 2) + 1
-                    right = (index * 2) + 2
+                    last = 2
+                    continue
                 else:
                     ref_value = h.get_at_index(index)
                     h.set_at_index(index, h.get_at_index(left))
                     h.set_at_index(left, ref_value)
                     index -= 1
-                    left = (index * 2) + 1
-                    right = (index * 2) + 2
+                    last = 1
+                    continue
                 continue
 
+        while last is not 0:
+            index = last
+            left = (last * 2) + 1
+            right = (last * 2) + 2
+            if right > h.length() - 1:
+                if h.get_at_index(left) < h.get_at_index(index):
+                    ref_value = h.get_at_index(index)
+                    h.set_at_index(index, h.get_at_index(left))
+                    h.set_at_index(left, ref_value)
+                    break
+                 break
+            elif h.get_at_index(right) < h.get_at_index(index) or h.get_at_index(left) < h.get_at_index(index):
+                if h.get_at_index(right) < h.get_at_index(left):
+                    ref_value = h.get_at_index(index)
+                    h.set_at_index(index, h.get_at_index(right))
+                    h.set_at_index(right, ref_value)
+                    last = right
+                    continue
+                else:
+                    ref_value = h.get_at_index(index)
+                    h.set_at_index(index, h.get_at_index(left))
+                    h.set_at_index(left, ref_value)
+                    last = left
+                    continue
+        return None
+            
+                
+            
+        
+        
         index = 0
         left = (index * 2) + 1
         right = (index * 2) + 2
